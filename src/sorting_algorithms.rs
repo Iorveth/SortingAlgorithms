@@ -1,4 +1,85 @@
-pub fn swap(array: &mut[i8], i1: usize, i2: usize){
+use std::fmt::Debug;
+struct TreeNode<T: PartialOrd> {
+    element: T,
+    left: Option<Box<TreeNode<T>>>,
+    right: Option<Box<TreeNode<T>>>,
+}
+
+struct RefNodeIterator<'a, T: PartialOrd + 'a> {
+    stack: Vec<&'a TreeNode<T>>,
+    next: Option<&'a T>,
+}
+
+impl<'a, T: PartialOrd + 'a> IntoIterator for &'a TreeNode<T> {
+    type Item = &'a T;
+    type IntoIter = RefNodeIterator<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let mut stack = Vec::new();
+
+        let smallest = pop_smallest_ref(self, &mut stack);
+
+        RefNodeIterator { stack, next: Some(smallest) }
+    }
+}
+
+impl<'a, T: PartialOrd + 'a> Iterator for RefNodeIterator<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<&'a T> {
+        if let Some(next) = self.next.take() {
+            return Some(next);
+        }
+
+        if let Some(node) = self.stack.pop() {
+            if let Some(ref right) = node.right {
+                self.stack.push(right);
+            }
+            return Some(&node.element);
+        }
+
+        None
+    }
+}
+
+fn pop_smallest_ref<'a, T>(node: &'a TreeNode<T>, stack: &mut Vec<&'a TreeNode<T>>) -> &'a T
+    where
+        T: PartialOrd + 'a
+{
+    if let Some(ref left) = node.left {
+        stack.push(node);
+        return pop_smallest_ref(left, stack);
+    }
+
+    if let Some(ref right) = node.right {
+        stack.push(right);
+    }
+
+    &node.element
+}
+
+impl<T: Ord + Debug> TreeNode<T> {
+    fn add(&mut self, value: T) {
+        if value <= self.element {
+            match self.left {
+                Some(ref mut node) => node.add(value),
+                None => self.left = {
+                    println!("Inserted left {:?}", value);
+                    Some(Box::new(TreeNode { element: value, left: None, right: None }))
+                },
+            }
+        } else {
+            match self.right {
+                Some(ref mut node) => node.add(value),
+                None => self.right = {
+                    println!("Inserted right {:?}", value);
+                    Some(Box::new(TreeNode { element: value, left: None, right: None }))
+                }
+            }
+        }
+    }
+}
+fn swap(array: &mut[i8], i1: usize, i2: usize){
     let buf = array[i1];
     array[i1] = array[i2];
     array[i2] = buf;
@@ -70,6 +151,20 @@ pub fn insert_sort(array: &mut [i8])  -> &mut[i8] {
             j = j - 1;
         }
         array[(j + 1) as usize] = key;
+    }
+    array
+}
+
+pub fn tree_sort(array: &mut [i8]) -> &mut[i8]{
+    let mut btree = TreeNode {element: array[0], left: None, right: None};
+    for i in 1..array.len() {
+        btree.add(array[i]);
+        println!("Added {}", array[i])
+    }
+
+    for (i, elem) in btree.into_iter().enumerate() {
+        array[i] = *elem;
+        print!("{} ",elem);
     }
     array
 }
