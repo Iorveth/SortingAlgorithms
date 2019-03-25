@@ -1,4 +1,6 @@
 use std::fmt::Debug;
+use std::collections::BinaryHeap;
+
 struct TreeNode<T: PartialOrd> {
     element: T,
     left: Option<Box<TreeNode<T>>>,
@@ -165,6 +167,30 @@ pub fn tree_sort(array: &mut [i8]) -> &mut[i8]{
     for (i, elem) in btree.into_iter().enumerate() {
         array[i] = *elem;
         print!("{} ",elem);
+    }
+    array
+}
+
+pub fn selection_sort(array: &mut [i8]) -> &mut[i8]{
+    for i in 0..array.len() - 1  {
+        let mut min = array[i];
+        for j in i..array.len()   {
+            if array[j] < min {
+                min = array[j];
+                swap(array, i, j);
+            }
+        }
+    }
+    array
+}
+
+pub fn pyramidal_sort (array: &mut [i8]) -> &mut[i8] {
+    let mut heap = BinaryHeap::new();
+    for i in 0..array.len() {
+        heap.push(array[i]);
+    }
+    for i in 0..array.len() {
+        array[array.len()-i-1] = heap.pop().unwrap();
     }
     array
 }
