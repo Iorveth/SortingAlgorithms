@@ -1,5 +1,10 @@
+extern crate rand;
 use std::fmt::Debug;
 use std::collections::BinaryHeap;
+use std::thread;
+use std::time::Duration;
+use std::cmp::Ordering;
+use sorting_algorithms::rand::prelude::*;
 
 struct TreeNode<T: PartialOrd> {
     element: T,
@@ -81,13 +86,21 @@ impl<T: Ord + Debug> TreeNode<T> {
         }
     }
 }
-fn swap(array: &mut[i8], i1: usize, i2: usize){
+fn swap(array: &mut [isize], i1: usize, i2: usize){
     let buf = array[i1];
     array[i1] = array[i2];
     array[i2] = buf;
 }
 
-pub fn bubble_sort(array: &mut [i8]) -> &mut[i8]{
+pub fn gen_array(length: usize) -> Vec<isize> {
+    let mut array = Vec::new();
+    for _ in 0..length {
+        array.push(rand::thread_rng().gen_range(-200,200));
+    }
+    array
+}
+
+pub fn bubble_sort(array: &mut [isize]) -> &mut[isize]{
     let mut b = true;
     let mut j = array.len() - 1;
     while b {
@@ -103,7 +116,7 @@ pub fn bubble_sort(array: &mut [i8]) -> &mut[i8]{
     array
 }
 
-pub fn shaker_sort(array: &mut [i8])  -> &mut[i8] {
+pub fn shaker_sort(array: &mut [isize])  -> &mut[isize] {
     let mut start = 0_usize;
     let mut end = array.len() - 1;
     let mut b = true;
@@ -128,7 +141,7 @@ pub fn shaker_sort(array: &mut [i8])  -> &mut[i8] {
     array
 }
 
-pub fn comb_sort(array: &mut [i8])  -> &mut[i8] {
+pub fn comb_sort(array: &mut [isize])  -> &mut[isize] {
     let k = 1.2473309;
     let len = array.len() - 1;
     let mut length = array.len() - 1;
@@ -144,10 +157,10 @@ pub fn comb_sort(array: &mut [i8])  -> &mut[i8] {
     bubble_sort(array)
 }
 
-pub fn insert_sort(array: &mut [i8])  -> &mut[i8] {
+pub fn insert_sort(array: &mut [isize]) -> &mut[isize] {
     for i in 1..array.len() {
         let key = array[i];
-        let mut  j = (i-1) as i8;
+        let mut  j = (i-1) as isize;
         while j >= 0 && array[j as usize] > key {
             array[j as usize + 1] = array[j as usize];
             j = j - 1;
@@ -157,7 +170,19 @@ pub fn insert_sort(array: &mut [i8])  -> &mut[i8] {
     array
 }
 
-pub fn tree_sort(array: &mut [i8]) -> &mut[i8]{
+pub fn insertion_sort(array: &mut [isize], left: usize, right: usize) -> &mut[isize] {
+    for i in (left + 1)..(right+1)  {
+        let mut j = i;
+        while j > left && array[j].cmp(&array[j - 1]) == Ordering::Less {
+            //println!("Swapped");
+            swap(array, j, j - 1);
+            j = j - 1;
+        }
+    }
+    array
+}
+
+pub fn tree_sort(array: &mut [isize]) -> &mut[isize]{
     let mut btree = TreeNode {element: array[0], left: None, right: None};
     for i in 1..array.len() {
         btree.add(array[i]);
@@ -171,7 +196,7 @@ pub fn tree_sort(array: &mut [i8]) -> &mut[i8]{
     array
 }
 
-pub fn selection_sort(array: &mut [i8]) -> &mut[i8]{
+pub fn selection_sort(array: &mut [isize]) -> &mut[isize]{
     for i in 0..array.len() - 1  {
         let mut min = array[i];
         for j in i..array.len()   {
@@ -184,13 +209,77 @@ pub fn selection_sort(array: &mut [i8]) -> &mut[i8]{
     array
 }
 
-pub fn pyramidal_sort (array: &mut [i8]) -> &mut[i8] {
+pub fn pyramidal_sort (array: &mut [isize]) -> &mut[isize] {
     let mut heap = BinaryHeap::new();
     for i in 0..array.len() {
         heap.push(array[i]);
     }
     for i in 0..array.len() {
         array[array.len()-i-1] = heap.pop().unwrap();
+    }
+    array
+}
+
+pub fn partition_hoare(array: &mut [isize], lo: isize, hi: isize) -> isize {
+    let pivot = array[lo as usize];
+    let mut i = lo - 1;
+    let mut j = hi + 1;
+    loop {
+        'a: loop {
+            i = i + 1;
+            if array[i as usize] < pivot {break 'a;}
+        }
+        'b: loop {
+            j = j - 1;
+            if array[j as usize] > pivot {break 'b;}
+        }
+        if i >= j {
+            break j
+        }
+        swap(array, i as usize, j as usize);
+    }
+}
+
+pub fn partition_lomuto(array: &mut [isize], lo: isize, hi: isize) -> isize {
+    let pivot = array[hi as usize];    // pivot
+    let mut i = lo - 1;  // Index of smaller element
+
+    for j in lo..hi
+    {
+        // If current element is smaller than or
+        // equal to pivot
+        if array[j as usize] <= pivot
+        {
+            i=i+1;    // increment index of smaller element
+            swap(array, i as usize, j as usize);
+        }
+    }
+    swap(array,(i + 1) as usize, hi as usize);
+    return i + 1;
+}
+
+pub fn quick_sort_lomuto (array: &mut [isize], lo: isize, hi: isize) -> &mut[isize] {
+    if lo < hi {
+        if hi - lo < 27 {
+            insertion_sort(array, lo as usize, hi as usize);
+        } else {
+            let p = partition_lomuto(array, lo, hi);
+            quick_sort_lomuto(array, lo, p - 1);
+            quick_sort_lomuto(array, p + 1, hi);
+        }
+    }
+    array
+}
+
+pub fn quick_sort_hoare (array: &mut [isize], lo: isize, hi: isize) -> &mut[isize] {
+    if lo < hi {
+        if hi - lo < 32 {
+            insertion_sort(array, lo as usize, hi as usize);
+        } else {
+            let p = partition_hoare(array, lo, hi);
+            quick_sort_hoare(array, lo, p);
+            quick_sort_hoare(array, p + 1, hi);
+        }
     }
     array
 }

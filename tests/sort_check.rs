@@ -39,6 +39,16 @@ mod integration_tests {
         assert!(sorting_algorithms::insert_sort(&mut array) == sorted);
         assert_ne!(sorting_algorithms::insert_sort(&mut array), not_sorted);
     }
+
+    #[test]
+    pub fn insertion_sort() {
+        let mut array = [1, 7, 0, -5, 6, 4, 2];
+        let sorted = [-5, 0, 1, 2, 4, 6, 7];
+        let not_sorted = [1, 7, 0, -5, 6, 4, 2];
+        assert_eq!(sorting_algorithms::insertion_sort(&mut array, 0, sorted.len() - 1), sorted);
+        assert!(sorting_algorithms::insertion_sort(&mut array, 0 , sorted.len() - 1) == sorted);
+        assert_ne!(sorting_algorithms::insertion_sort(&mut array, 0, sorted.len() - 1), not_sorted);
+    }
     #[should_panic]
     #[test]
     pub fn tree_sort_1() {
@@ -49,17 +59,8 @@ mod integration_tests {
         assert!(sorting_algorithms::tree_sort(&mut array) == sorted);
         assert_eq!(sorting_algorithms::tree_sort(&mut array), not_sorted);
     }
-    /*
-    #[test]
-    pub fn tree_sort_2() {
-        let mut array = [1, 14, 0, 7];
-        let sorted = [0, 1, 7, 14];
-        let not_sorted = [1, 14, 0, 7];
-        assert_eq!(sorting_algorithms::tree_sort(&mut array), sorted);
-        assert!(sorting_algorithms::tree_sort(&mut array) == sorted);
-        assert_ne!(sorting_algorithms::tree_sort(&mut array), not_sorted);
-    }
-*/
+
+
     #[test]
     pub fn selection_sort() {
         let mut array = [1, 7, 0, 14, -5, -9, 2, 17];
@@ -78,5 +79,12 @@ mod integration_tests {
         assert_eq!(sorting_algorithms::pyramidal_sort(&mut array), sorted);
         assert!(sorting_algorithms::pyramidal_sort(&mut array) == sorted);
         assert_ne!(sorting_algorithms::pyramidal_sort(&mut array), not_sorted);
+    }
+
+    #[test]
+    pub fn quick_sort_lomuto() {
+        let mut array = sorting_algorithms::gen_array(2000).clone();
+        let mut array_cloned = array.clone();
+        assert_eq!(sorting_algorithms::quick_sort_lomuto(&mut array, 0, 1999), sorting_algorithms::insertion_sort(&mut array_cloned, 0 ,1999));
     }
 }
