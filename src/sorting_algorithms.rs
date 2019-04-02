@@ -92,10 +92,10 @@ fn swap(array: &mut [isize], i1: usize, i2: usize){
     array[i2] = buf;
 }
 
-pub fn gen_array(length: usize) -> Vec<isize> {
+pub fn gen_array(length: usize, min: isize, max: isize) -> Vec<isize> {
     let mut array = Vec::new();
     for _ in 0..length {
-        array.push(rand::thread_rng().gen_range(-200,200));
+        array.push(rand::thread_rng().gen_range(min,max));
     }
     array
 }
@@ -117,26 +117,26 @@ pub fn bubble_sort(array: &mut [isize]) -> &mut[isize]{
 }
 
 pub fn shaker_sort(array: &mut [isize])  -> &mut[isize] {
-    let mut start = 0_usize;
-    let mut end = array.len() - 1;
+    let mut start = 0;
+    let mut end = array.len();
     let mut b = true;
     while b {
         b = false;
-        for i in start..end {
-            if array[i] > array[i + 1] {
-                swap(array, i, i+1);
+        start+=1;
+        for i in start as usize..end {
+            if array[i-1] > array[i] {
+                swap(array, i - 1, i);
                 b = true;
             }
         }
         if b == false {break;}
-        for i in start..end {
+        end -=1;
+        for i in start as usize..end {
             if array[end-i] < array[end-i-1] {
                 swap(array, end - i, end - i - 1);
                 b = true;
             }
         }
-        end -=1;
-        start+=1;
     }
     array
 }
@@ -170,11 +170,10 @@ pub fn insert_sort(array: &mut [isize]) -> &mut[isize] {
     array
 }
 
-pub fn insertion_sort(array: &mut [isize], left: usize, right: usize) -> &mut[isize] {
-    for i in (left + 1)..(right+1)  {
+pub fn insertion_sort(array: &mut [isize], left: isize, right: isize, _: Option<Pivot>) -> &mut[isize] {
+    for i in (left + 1) as usize..(right+1) as usize  {
         let mut j = i;
-        while j > left && array[j].cmp(&array[j - 1]) == Ordering::Less {
-            //println!("Swapped");
+        while j > left as usize && array[j].cmp(&array[j - 1]) == Ordering::Less {
             swap(array, j, j - 1);
             j = j - 1;
         }
@@ -219,24 +218,32 @@ pub fn pyramidal_sort (array: &mut [isize]) -> &mut[isize] {
     }
     array
 }
-
-pub fn partition_hoare(array: &mut [isize], lo: isize, hi: isize) -> isize {
+#[derive(Copy, Clone)]
+pub enum Pivot {
+    Static,
+    Random
+}
+pub fn partition_hoare(array: &mut [isize], lo: isize, hi: isize, p: Pivot) -> isize {
     let pivot = array[lo as usize];
+    if let Pivot::Random = p {
+        let pivot = array[rand::thread_rng().gen_range(lo, hi) as usize];
+    }
     let mut i = lo - 1;
     let mut j = hi + 1;
     loop {
-        'a: loop {
+        i = i + 1;
+        while array[i as usize] < pivot {
             i = i + 1;
-            if array[i as usize] < pivot {break 'a;}
         }
-        'b: loop {
-            j = j - 1;
-            if array[j as usize] > pivot {break 'b;}
+        j = j - 1;
+        while array[j as usize] > pivot{
+            j = j - 1
         }
-        if i >= j {
+        if i < j {
+            swap(array, i as usize, j as usize);
+        } else {
             break j
         }
-        swap(array, i as usize, j as usize);
     }
 }
 
@@ -258,27 +265,27 @@ pub fn partition_lomuto(array: &mut [isize], lo: isize, hi: isize) -> isize {
     return i + 1;
 }
 
-pub fn quick_sort_lomuto (array: &mut [isize], lo: isize, hi: isize) -> &mut[isize] {
+pub fn quick_sort_lomuto (array: &mut [isize], lo: isize, hi: isize, pivot_type: Option<Pivot>) -> &mut[isize] {
     if lo < hi {
         if hi - lo < 27 {
-            insertion_sort(array, lo as usize, hi as usize);
+            insertion_sort(array, lo, hi, None);
         } else {
             let p = partition_lomuto(array, lo, hi);
-            quick_sort_lomuto(array, lo, p - 1);
-            quick_sort_lomuto(array, p + 1, hi);
+            quick_sort_lomuto(array, lo, p - 1, pivot_type);
+            quick_sort_lomuto(array, p + 1, hi, pivot_type);
         }
     }
     array
 }
 
-pub fn quick_sort_hoare (array: &mut [isize], lo: isize, hi: isize) -> &mut[isize] {
+pub fn quick_sort_hoare (array: &mut [isize], lo: isize, hi: isize, pivot_type: Option<Pivot>) -> &mut[isize] {
     if lo < hi {
-        if hi - lo < 32 {
-            insertion_sort(array, lo as usize, hi as usize);
+        if hi - lo < 27 {
+            insertion_sort(array, lo, hi, None);
         } else {
-            let p = partition_hoare(array, lo, hi);
-            quick_sort_hoare(array, lo, p);
-            quick_sort_hoare(array, p + 1, hi);
+            let p = partition_hoare(array, lo, hi, pivot_type.unwrap());
+            quick_sort_hoare(array, lo, p, pivot_type);
+            quick_sort_hoare(array, p+1, hi, pivot_type);
         }
     }
     array

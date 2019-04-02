@@ -3,6 +3,7 @@ extern crate SortingAlgorithms;
 #[cfg(test)]
 mod integration_tests {
     use SortingAlgorithms::sorting_algorithms;
+    use SortingAlgorithms::sorting_algorithms::Pivot;
     #[test]
     pub fn bubble_sort() {
         let mut array = [1, 7, 0, -5, 6, 4, 2];
@@ -45,9 +46,9 @@ mod integration_tests {
         let mut array = [1, 7, 0, -5, 6, 4, 2];
         let sorted = [-5, 0, 1, 2, 4, 6, 7];
         let not_sorted = [1, 7, 0, -5, 6, 4, 2];
-        assert_eq!(sorting_algorithms::insertion_sort(&mut array, 0, sorted.len() - 1), sorted);
-        assert!(sorting_algorithms::insertion_sort(&mut array, 0 , sorted.len() - 1) == sorted);
-        assert_ne!(sorting_algorithms::insertion_sort(&mut array, 0, sorted.len() - 1), not_sorted);
+        assert_eq!(sorting_algorithms::insertion_sort(&mut array, 0, (sorted.len() - 1) as isize, None), sorted);
+        assert!(sorting_algorithms::insertion_sort(&mut array, 0 , (sorted.len() - 1) as isize, None) == sorted);
+        assert_ne!(sorting_algorithms::insertion_sort(&mut array, 0, (sorted.len() - 1) as isize, None), not_sorted);
     }
     #[should_panic]
     #[test]
@@ -83,8 +84,22 @@ mod integration_tests {
 
     #[test]
     pub fn quick_sort_lomuto() {
-        let mut array = sorting_algorithms::gen_array(2000).clone();
+        let mut array = sorting_algorithms::gen_array(2000, -200, 200).clone();
         let mut array_cloned = array.clone();
-        assert_eq!(sorting_algorithms::quick_sort_lomuto(&mut array, 0, 1999), sorting_algorithms::insertion_sort(&mut array_cloned, 0 ,1999));
+        assert_eq!(sorting_algorithms::quick_sort_lomuto(&mut array, 0, 1999, None), sorting_algorithms::pyramidal_sort(&mut array_cloned));
+    }
+
+    #[test]
+    pub fn quick_sort_hoare_static_pivot() {
+        let mut array = sorting_algorithms::gen_array(2000, -200, 200).clone();
+        let mut array_cloned = array.clone();
+        assert_eq!(sorting_algorithms::quick_sort_hoare(&mut array, 0, 1999, Some(Pivot::Static)), sorting_algorithms::pyramidal_sort(&mut array_cloned));
+    }
+
+    #[test]
+    pub fn quick_sort_hoare_random_pivot() {
+        let mut array = sorting_algorithms::gen_array(2000, -200, 200).clone();
+        let mut array_cloned = array.clone();
+        assert_eq!(sorting_algorithms::quick_sort_hoare(&mut array, 0, 1999, Some(Pivot::Random)), sorting_algorithms::pyramidal_sort(&mut array_cloned));
     }
 }
