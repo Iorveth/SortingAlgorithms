@@ -7,12 +7,11 @@ use sorting_algorithms::*;
 fn main() {
     const ARRAY_LENGTH: usize = 4000;
     let mut array = sorting_algorithms::gen_array(ARRAY_LENGTH, - 200, 200).clone();
-
     let mut array1 = array.clone();
     let bubble_time = time_sort(&bubble_sort, &mut array1);
 
-    /*let mut array2 = array.clone();
-    let shaker_time = time_sort(&shaker_sort, &mut array2);*/
+    let mut array2 = array.clone();
+    let shaker_time = time_sort(&shaker_sort, &mut array2);
 
     let mut array3 = array.clone();
     let comb_time = time_sort(&comb_sort, &mut array3);
@@ -40,7 +39,7 @@ fn main() {
 
     println!("sorting {} elements\n", ARRAY_LENGTH);
     println!("bubble: {} ms", bubble_time);
-    //println!("shaker: {} ms", shaker_time);
+    println!("shaker: {} ms", shaker_time);
     println!("comb: {} ms", comb_time);
     println!("insert: {} ms", insert_time);
     println!("selection: {} ms", selection_time);
@@ -49,6 +48,7 @@ fn main() {
     println!("quick sort lomuto: {} ms", quick_sort_lomuto_time);
     println!("quick sort hoare static pivot time: {} ms", quick_sort_hoare_static_pivot_time);
     println!("quick sort hoare random pivot time: {} ms", quick_sort_hoare_random_pivot_time);
+
 }
 
 fn time_sort(sort: &Fn(&mut[isize]) -> &mut[isize], array: &mut[isize]) -> usize {

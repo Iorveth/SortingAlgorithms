@@ -117,26 +117,32 @@ pub fn bubble_sort(array: &mut [isize]) -> &mut[isize]{
 }
 
 pub fn shaker_sort(array: &mut [isize])  -> &mut[isize] {
+    let mut swapped = true;
     let mut start = 0;
     let mut end = array.len();
-    let mut b = true;
-    while b {
-        b = false;
-        start+=1;
-        for i in start as usize..end {
-            if array[i-1] > array[i] {
-                swap(array, i - 1, i);
-                b = true;
+    while swapped {
+
+        swapped = false;
+
+        for i in start..end-1 {
+            if array[i] > array[i + 1] {
+                swap(array, i, i+1);
+                swapped = true;
             }
         }
-        if b == false {break;}
-        end -=1;
-        for i in start as usize..end {
-            if array[end-i] < array[end-i-1] {
-                swap(array, end - i, end - i - 1);
-                b = true;
+
+        if swapped == false
+        {break;}
+
+        swapped = false;
+        end-=1;
+        for  i in (start..end).rev(){
+            if array[i] > array[i + 1] {
+                swap(array, i, i + 1);
+                swapped = true;
             }
         }
+        start += 1;
     }
     array
 }
