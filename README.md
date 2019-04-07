@@ -8,7 +8,7 @@ Various Sorting Algorithms, implemented in rust
 5.Selection    
 6.Pyramidal   
 7.Quick sort (with lomuto/hoare partition and random/static pivotes in hoare partition)   
-8.Merge sort   
+8.Merge      
 
 # TODO:
 1. Fix tree sort    
