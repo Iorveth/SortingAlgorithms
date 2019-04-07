@@ -84,22 +84,29 @@ mod integration_tests {
 
     #[test]
     pub fn quick_sort_lomuto() {
-        let mut array = sorting_algorithms::gen_array(2000, -200, 200).clone();
+        let mut array = sorting_algorithms::gen_array(4000, -200, 250).clone();
         let mut array_cloned = array.clone();
-        assert_eq!(sorting_algorithms::quick_sort_lomuto(&mut array, 0, 1999, None), sorting_algorithms::pyramidal_sort(&mut array_cloned));
+        assert_eq!(sorting_algorithms::quick_sort_lomuto(&mut array, 0, 3999, None), sorting_algorithms::pyramidal_sort(&mut array_cloned));
     }
 
     #[test]
     pub fn quick_sort_hoare_static_pivot() {
-        let mut array = sorting_algorithms::gen_array(2000, -200, 200).clone();
+        let mut array = sorting_algorithms::gen_array(2000, -250, 200).clone();
         let mut array_cloned = array.clone();
         assert_eq!(sorting_algorithms::quick_sort_hoare(&mut array, 0, 1999, Some(Pivot::Static)), sorting_algorithms::pyramidal_sort(&mut array_cloned));
     }
 
     #[test]
     pub fn quick_sort_hoare_random_pivot() {
-        let mut array = sorting_algorithms::gen_array(2000, -200, 200).clone();
+        let mut array = sorting_algorithms::gen_array(1000, -200, 200).clone();
         let mut array_cloned = array.clone();
-        assert_eq!(sorting_algorithms::quick_sort_hoare(&mut array, 0, 1999, Some(Pivot::Random)), sorting_algorithms::pyramidal_sort(&mut array_cloned));
+        assert_eq!(sorting_algorithms::quick_sort_hoare(&mut array, 0, 999, Some(Pivot::Random)), sorting_algorithms::pyramidal_sort(&mut array_cloned));
+    }
+
+    #[test]
+    pub fn merge_sort() {
+        let mut array = sorting_algorithms::gen_array(500, -100, 100).clone();
+        let mut array_cloned = array.clone();
+        assert_eq!(sorting_algorithms::merge_sort(&mut array, 0, 499, None), sorting_algorithms::pyramidal_sort(&mut array_cloned));
     }
 }

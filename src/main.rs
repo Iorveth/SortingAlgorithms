@@ -6,7 +6,7 @@ use sorting_algorithms::*;
 
 fn main() {
     const ARRAY_LENGTH: usize = 4000;
-    let mut array = sorting_algorithms::gen_array(ARRAY_LENGTH, - 200, 200).clone();
+    let array = sorting_algorithms::gen_array(ARRAY_LENGTH, -200_i16, 200_i16).clone();
     let mut array1 = array.clone();
     let bubble_time = time_sort(&bubble_sort, &mut array1);
 
@@ -37,6 +37,10 @@ fn main() {
     let mut array10 = array.clone();
     let quick_sort_hoare_random_pivot_time = time_sort_2(&quick_sort_hoare, &mut array10, 0, (ARRAY_LENGTH - 1) as isize, Some(Pivot::Random));
 
+
+    let mut array11 = array.clone();
+    let merge_sort_time = time_sort_2(&merge_sort, &mut array11, 0, (ARRAY_LENGTH - 1) as isize, None);
+
     println!("sorting {} elements\n", ARRAY_LENGTH);
     println!("bubble: {} ms", bubble_time);
     println!("shaker: {} ms", shaker_time);
@@ -48,10 +52,10 @@ fn main() {
     println!("quick sort lomuto: {} ms", quick_sort_lomuto_time);
     println!("quick sort hoare static pivot time: {} ms", quick_sort_hoare_static_pivot_time);
     println!("quick sort hoare random pivot time: {} ms", quick_sort_hoare_random_pivot_time);
-
+    println!("merge: {} ms", merge_sort_time);
 }
 
-fn time_sort(sort: &Fn(&mut[isize]) -> &mut[isize], array: &mut[isize]) -> usize {
+fn time_sort<T: PartialOrd + Copy>(sort: &Fn(&mut[T]) -> &mut[T], array: &mut[T]) -> usize {
     let mut timer = benchmark::Timer::new();
 
     timer.start();
@@ -61,7 +65,7 @@ fn time_sort(sort: &Fn(&mut[isize]) -> &mut[isize], array: &mut[isize]) -> usize
     timer.get_elapsed_in_mcs() as usize
 }
 
-fn time_sort_2(sort: &Fn(&mut[isize], isize, isize, Option<Pivot>) -> &mut[isize], array: &mut[isize], lo: isize, hi: isize, pivot: Option<Pivot>) -> usize {
+fn time_sort_2<T: PartialOrd + Copy>(sort: &Fn(&mut[T], isize, isize, Option<Pivot>) -> &mut[T], array: &mut[T], lo: isize, hi: isize, pivot: Option<Pivot>) -> usize {
     let mut timer = benchmark::Timer::new();
 
     timer.start();
@@ -71,9 +75,9 @@ fn time_sort_2(sort: &Fn(&mut[isize], isize, isize, Option<Pivot>) -> &mut[isize
     timer.get_elapsed_in_mcs() as usize
 }
 
-fn verify_sorted(array: &mut[isize]) {
-    let mut i_min = isize::MIN;
-    for i in 0..array.len() {
+fn verify_sorted<T: PartialOrd + Copy>(array: &mut[T]) {
+    let mut i_min = array[0];
+    for i in 1..array.len() {
         if array[i] >= i_min {
             i_min = array[i];
         } else {

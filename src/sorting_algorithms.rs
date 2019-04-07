@@ -1,8 +1,6 @@
 extern crate rand;
 use std::fmt::Debug;
 use std::collections::BinaryHeap;
-use std::thread;
-use std::time::Duration;
 use std::cmp::Ordering;
 use sorting_algorithms::rand::prelude::*;
 
@@ -86,13 +84,13 @@ impl<T: Ord + Debug> TreeNode<T> {
         }
     }
 }
-fn swap(array: &mut [isize], i1: usize, i2: usize){
+fn swap <T: Copy>(array: &mut [T], i1: usize, i2: usize){
     let buf = array[i1];
     array[i1] = array[i2];
     array[i2] = buf;
 }
 
-pub fn gen_array(length: usize, min: isize, max: isize) -> Vec<isize> {
+pub fn gen_array <T: rand::distributions::uniform::SampleUniform + PartialOrd + Copy>(length: usize, min: T, max: T) -> Vec<T> {
     let mut array = Vec::new();
     for _ in 0..length {
         array.push(rand::thread_rng().gen_range(min,max));
@@ -100,7 +98,7 @@ pub fn gen_array(length: usize, min: isize, max: isize) -> Vec<isize> {
     array
 }
 
-pub fn bubble_sort(array: &mut [isize]) -> &mut[isize]{
+pub fn bubble_sort<T: PartialOrd+Copy>(array: &mut [T]) -> &mut[T]{
     let mut b = true;
     let mut j = array.len() - 1;
     while b {
@@ -116,7 +114,7 @@ pub fn bubble_sort(array: &mut [isize]) -> &mut[isize]{
     array
 }
 
-pub fn shaker_sort(array: &mut [isize])  -> &mut[isize] {
+pub fn shaker_sort <T: PartialOrd + Copy>(array: &mut [T])  -> &mut[T] {
     let mut swapped = true;
     let mut start = 0;
     let mut end = array.len();
@@ -147,9 +145,8 @@ pub fn shaker_sort(array: &mut [isize])  -> &mut[isize] {
     array
 }
 
-pub fn comb_sort(array: &mut [isize])  -> &mut[isize] {
+pub fn comb_sort <T: PartialOrd+Copy>(array: &mut [T])  -> &mut[T] {
     let k = 1.2473309;
-    let len = array.len() - 1;
     let mut length = array.len() - 1;
     while length>1 {
         for i in 0..array.len() - length {
@@ -159,11 +156,10 @@ pub fn comb_sort(array: &mut [isize])  -> &mut[isize] {
         }
         length = ((length as f64) /  k) as usize;
     }
-    println!("{:?}",array);
     bubble_sort(array)
 }
 
-pub fn insert_sort(array: &mut [isize]) -> &mut[isize] {
+pub fn insert_sort <T: PartialOrd+Copy>(array: &mut [T]) -> &mut[T] {
     for i in 1..array.len() {
         let key = array[i];
         let mut  j = (i-1) as isize;
@@ -176,7 +172,7 @@ pub fn insert_sort(array: &mut [isize]) -> &mut[isize] {
     array
 }
 
-pub fn insertion_sort(array: &mut [isize], left: isize, right: isize, _: Option<Pivot>) -> &mut[isize] {
+pub fn insertion_sort <T: Ord+Copy>(array: &mut [T], left: isize, right: isize, _: Option<Pivot>) -> &mut[T] {
     for i in (left + 1) as usize..(right+1) as usize  {
         let mut j = i;
         while j > left as usize && array[j].cmp(&array[j - 1]) == Ordering::Less {
@@ -187,21 +183,19 @@ pub fn insertion_sort(array: &mut [isize], left: isize, right: isize, _: Option<
     array
 }
 
-pub fn tree_sort(array: &mut [isize]) -> &mut[isize]{
+pub fn tree_sort<T: Ord + Debug+ Copy>(array: &mut [T]) -> &mut[T]{
     let mut btree = TreeNode {element: array[0], left: None, right: None};
     for i in 1..array.len() {
         btree.add(array[i]);
-        println!("Added {}", array[i])
     }
 
     for (i, elem) in btree.into_iter().enumerate() {
         array[i] = *elem;
-        print!("{} ",elem);
     }
     array
 }
 
-pub fn selection_sort(array: &mut [isize]) -> &mut[isize]{
+pub fn selection_sort <T: PartialOrd+Copy>(array: &mut [T]) -> &mut[T]{
     for i in 0..array.len() - 1  {
         let mut min = array[i];
         for j in i..array.len()   {
@@ -214,7 +208,7 @@ pub fn selection_sort(array: &mut [isize]) -> &mut[isize]{
     array
 }
 
-pub fn pyramidal_sort (array: &mut [isize]) -> &mut[isize] {
+pub fn pyramidal_sort <T: Ord+Copy> (array: &mut [T]) -> &mut[T] {
     let mut heap = BinaryHeap::new();
     for i in 0..array.len() {
         heap.push(array[i]);
@@ -229,10 +223,10 @@ pub enum Pivot {
     Static,
     Random
 }
-pub fn partition_hoare(array: &mut [isize], lo: isize, hi: isize, p: Pivot) -> isize {
-    let pivot = array[lo as usize];
+pub fn partition_hoare  <T: PartialOrd+Copy>(array: &mut [T], lo: isize, hi: isize, p: Pivot) -> isize {
+    let mut pivot = array[lo as usize];
     if let Pivot::Random = p {
-        let pivot = array[rand::thread_rng().gen_range(lo, hi) as usize];
+        pivot = array[rand::thread_rng().gen_range(lo, hi) as usize];
     }
     let mut i = lo - 1;
     let mut j = hi + 1;
@@ -253,7 +247,7 @@ pub fn partition_hoare(array: &mut [isize], lo: isize, hi: isize, p: Pivot) -> i
     }
 }
 
-pub fn partition_lomuto(array: &mut [isize], lo: isize, hi: isize) -> isize {
+pub fn partition_lomuto  <T: PartialOrd+Copy>(array: &mut [T], lo: isize, hi: isize) -> isize {
     let pivot = array[hi as usize];    // pivot
     let mut i = lo - 1;  // Index of smaller element
 
@@ -271,7 +265,7 @@ pub fn partition_lomuto(array: &mut [isize], lo: isize, hi: isize) -> isize {
     return i + 1;
 }
 
-pub fn quick_sort_lomuto (array: &mut [isize], lo: isize, hi: isize, pivot_type: Option<Pivot>) -> &mut[isize] {
+pub fn quick_sort_lomuto  <T: Ord+Copy>(array: &mut [T], lo: isize, hi: isize, pivot_type: Option<Pivot>) -> &mut[T] {
     if lo < hi {
         if hi - lo < 27 {
             insertion_sort(array, lo, hi, None);
@@ -284,7 +278,7 @@ pub fn quick_sort_lomuto (array: &mut [isize], lo: isize, hi: isize, pivot_type:
     array
 }
 
-pub fn quick_sort_hoare (array: &mut [isize], lo: isize, hi: isize, pivot_type: Option<Pivot>) -> &mut[isize] {
+pub fn quick_sort_hoare <T: Ord+Copy> (array: &mut [T], lo: isize, hi: isize, pivot_type: Option<Pivot>) -> &mut[T] {
     if lo < hi {
         if hi - lo < 27 {
             insertion_sort(array, lo, hi, None);
@@ -293,6 +287,57 @@ pub fn quick_sort_hoare (array: &mut [isize], lo: isize, hi: isize, pivot_type: 
             quick_sort_hoare(array, lo, p, pivot_type);
             quick_sort_hoare(array, p+1, hi, pivot_type);
         }
+    }
+    array
+}
+
+pub fn merge<T: Ord+Copy>(array: &mut [T], lo: usize, m: usize, hi: usize) {
+    let n1 = m-lo+1;
+    let n2 = hi-m;
+    let mut left = Vec::<T>::with_capacity(n1);
+    let mut right = Vec::<T>::with_capacity(n2);
+
+    for i in 0..n1 {
+        left.push(array[lo + i]);
+    }
+
+    for j in 0..n2 {
+        right.push(array[m + 1 + j]);
+    }
+
+    let (mut i, mut j) = (0,0);
+    let mut k = lo;
+
+    while i < n1 && j < n2 {
+        if left[i] <= right[j]{
+            array[k] = left[i];
+            i+=1;
+        } else {
+            array[k] = right[j];
+            j+=1;
+        }
+        k+=1;
+    }
+
+    while i < n1 {
+        array[k] = left[i];
+        i+=1;
+        k+=1;
+    }
+    while j < n2 {
+        array[k] = right[j];
+        j+=1;
+        k+=1;
+    }
+}
+pub fn merge_sort<T: Ord+Copy>(array: &mut [T], lo: isize, hi: isize, pivot_type: Option<Pivot>) -> &mut[T] {
+    if lo < hi {
+        let m = lo+(hi-lo)/2;
+        if m - lo > 0 {
+            merge_sort(array, lo, m, pivot_type);
+            merge_sort(array, m + 1, hi, pivot_type);
+        }
+        merge(array, lo as usize, m as usize, hi as usize);
     }
     array
 }
