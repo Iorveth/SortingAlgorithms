@@ -157,8 +157,8 @@ mod integration_tests {
         );
 
         assert!(
-            sorting_algorithms::radix_sort(&mut array) ==
-            sorting_algorithms::pyramidal_sort(&mut array_cloned_2)
+            sorting_algorithms::radix_sort(&mut array)
+                == sorting_algorithms::pyramidal_sort(&mut array_cloned_2)
         );
     }
 }

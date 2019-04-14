@@ -432,9 +432,11 @@ pub fn counting_sort<T: Integer + NumCast + Ord + Copy + AddAssign + SubAssign>(
 }
 
 fn count_sort<T: Integer + NumCast + Ord + Copy + AddAssign + SubAssign>(
-    array: &mut [T], radix: usize, exp: usize, min: T
+    array: &mut [T],
+    radix: usize,
+    exp: usize,
+    min: T,
 ) -> &mut [T] {
-
     let n = array.len();
     let mut count = Vec::<T>::with_capacity(radix);
     let mut output = Vec::<T>::with_capacity(n);
@@ -448,7 +450,7 @@ fn count_sort<T: Integer + NumCast + Ord + Copy + AddAssign + SubAssign>(
 
     for i in 0..n {
         let ind: usize = NumCast::from(array[i] - min).unwrap();
-        count[(ind/exp)%radix] += T::one();
+        count[(ind / exp) % radix] += T::one();
     }
 
     for i in 1..radix {
@@ -457,9 +459,9 @@ fn count_sort<T: Integer + NumCast + Ord + Copy + AddAssign + SubAssign>(
 
     for i in (0..n).rev() {
         let ind: usize = NumCast::from(array[i] - min).unwrap();
-        let index: usize = NumCast::from(count[(ind/exp)%radix] - T::one()).unwrap();
+        let index: usize = NumCast::from(count[(ind / exp) % radix] - T::one()).unwrap();
         output[index] = array[i];
-        count[(ind/exp)%10] -= T::one();
+        count[(ind / exp) % 10] -= T::one();
     }
 
     for i in 0..n {
@@ -468,7 +470,9 @@ fn count_sort<T: Integer + NumCast + Ord + Copy + AddAssign + SubAssign>(
     array
 }
 
-pub fn radix_sort<T: Integer + NumCast + Ord + Copy + AddAssign + SubAssign>(array: &mut [T]) -> &mut [T] {
+pub fn radix_sort<T: Integer + NumCast + Ord + Copy + AddAssign + SubAssign>(
+    array: &mut [T],
+) -> &mut [T] {
     // Find the maximum number to know number of digits
     let max = *array.iter().max().unwrap();
     let min = *array.iter().min().unwrap();
@@ -478,10 +482,9 @@ pub fn radix_sort<T: Integer + NumCast + Ord + Copy + AddAssign + SubAssign>(arr
     // of passing digit number, exp is passed. exp is 10^i
     // where i is current digit number
     let mut exp = 1_usize;
-    while (max-min)/NumCast::from(exp).unwrap() >= T::one() {
+    while (max - min) / NumCast::from(exp).unwrap() >= T::one() {
         count_sort(array, RADIX, exp, min);
         exp *= RADIX;
     }
     array
 }
-
