@@ -73,6 +73,8 @@ fn main() {
     let mut array12 = array.clone();
     let counting_sort_time = time_sort(&counting_sort, &mut array12);
 
+    let mut array13 = array.clone();
+    let radix_sort_time = time_sort(&radix_sort, &mut array13);
     println!("sorting {} elements\n", ARRAY_LENGTH);
     println!("bubble: {} ms", bubble_time);
     println!("shaker: {} ms", shaker_time);
@@ -92,6 +94,7 @@ fn main() {
     );
     println!("merge: {} ms", merge_sort_time);
     println!("counting: {} ms", counting_sort_time);
+    println!("radix: {} ms", radix_sort_time);
 }
 
 fn time_sort<T: PartialOrd + Copy>(sort: &Fn(&mut [T]) -> &mut [T], array: &mut [T]) -> usize {

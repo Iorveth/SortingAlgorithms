@@ -145,4 +145,20 @@ mod integration_tests {
             sorting_algorithms::merge_sort(&mut array_cloned, 0, 2999, None)
         );
     }
+
+    #[test]
+    pub fn radix_sort() {
+        let mut array = sorting_algorithms::gen_array(2000, -250, 400).clone();
+        let mut array_cloned = array.clone();
+        let mut array_cloned_2 = array.clone();
+        assert_eq!(
+            sorting_algorithms::radix_sort(&mut array),
+            sorting_algorithms::merge_sort(&mut array_cloned, 0, 1999, None)
+        );
+
+        assert!(
+            sorting_algorithms::radix_sort(&mut array) ==
+            sorting_algorithms::pyramidal_sort(&mut array_cloned_2)
+        );
+    }
 }

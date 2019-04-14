@@ -430,3 +430,58 @@ pub fn counting_sort<T: Integer + NumCast + Ord + Copy + AddAssign + SubAssign>(
     }
     array
 }
+
+fn count_sort<T: Integer + NumCast + Ord + Copy + AddAssign + SubAssign>(
+    array: &mut [T], radix: usize, exp: usize, min: T
+) -> &mut [T] {
+
+    let n = array.len();
+    let mut count = Vec::<T>::with_capacity(radix);
+    let mut output = Vec::<T>::with_capacity(n);
+
+    for i in 0..radix {
+        count.push(T::zero());
+    }
+    for i in 0..n {
+        output.push(T::zero());
+    }
+
+    for i in 0..n {
+        let ind: usize = NumCast::from(array[i] - min).unwrap();
+        count[(ind/exp)%radix] += T::one();
+    }
+
+    for i in 1..radix {
+        count[i] += count[i - 1];
+    }
+
+    for i in (0..n).rev() {
+        let ind: usize = NumCast::from(array[i] - min).unwrap();
+        let index: usize = NumCast::from(count[(ind/exp)%radix] - T::one()).unwrap();
+        output[index] = array[i];
+        count[(ind/exp)%10] -= T::one();
+    }
+
+    for i in 0..n {
+        array[i] = output[i];
+    }
+    array
+}
+
+pub fn radix_sort<T: Integer + NumCast + Ord + Copy + AddAssign + SubAssign>(array: &mut [T]) -> &mut [T] {
+    // Find the maximum number to know number of digits
+    let max = *array.iter().max().unwrap();
+    let min = *array.iter().min().unwrap();
+    //RADIX
+    const RADIX: usize = 10;
+    // Do counting sort for every digit. Note that instead
+    // of passing digit number, exp is passed. exp is 10^i
+    // where i is current digit number
+    let mut exp = 1_usize;
+    while (max-min)/NumCast::from(exp).unwrap() >= T::one() {
+        count_sort(array, RADIX, exp, min);
+        exp *= RADIX;
+    }
+    array
+}
+
